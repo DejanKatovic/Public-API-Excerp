@@ -24,7 +24,7 @@ export const Report: React.FC<Props> = ({
     <>
       <div className="md:flex gap-4 mt-3">
         <div className="basis-1/3 lg:basis-1/5">
-          <Summary />
+          <Summary companies={companies} />
         </div>
         <div className="basis-2/3 lg:basis-4/5">
           <div className="lg:flex gap-12">

@@ -1,87 +1,92 @@
-import React, { useState, useContext, useEffect, useRef } from 'react'
+import React, { useState, useContext, useEffect, useRef } from "react";
 
-import { CompanyContext } from '../../../context/CompanyContext'
-import { getCompanyDataPoints } from '../../../api/getCompanyDataPoints'
-import { getCompanyKeyInformation } from '../../../api/getCompanyKeyInformation'
-import { DataPoints } from '../../../components/d3/DataPoints'
-import { TypeKeyInformation } from '../../../types/Type'
-import { TypeDataDpData } from '../../../types/Type'
-import { PageLoading } from '../../../components/PageLoading'
-import _ from 'lodash'
+import { CompanyContext } from "../../../context/CompanyContext";
+import { getCompanyDataPoints } from "../../../api/getCompanyDataPoints";
+import { getCompanyKeyInformation } from "../../../api/getCompanyKeyInformation";
+import { DataPoints } from "../../../components/d3/DataPoints";
+import { TypeCompany, TypeKeyInformation } from "../../../types/Type";
+import { TypeDataDpData } from "../../../types/Type";
+import { PageLoading } from "../../../components/PageLoading";
+import _ from "lodash";
+import { getCompanyName } from "../../../utils/getCompanyName";
 
-export const Summary: React.FC = () => {
-  const { company_id, company_name } = useContext(CompanyContext)
-  const [dataKeyInfo, setDataKeyInfo] = useState<TypeKeyInformation | null>()
-  const [dataDp, setDataDp] = useState<TypeDataDpData[] | null>()
-  const [loadingKey, setLoadingKey] = useState(true)
-  const [loadingPoint, setLoadingPoint] = useState(true)
+interface Props {
+  companies: TypeCompany[] | [];
+}
+
+export const Summary: React.FC<Props> = ({ companies }) => {
+  const { company_id, company_name } = useContext(CompanyContext);
+  const [dataKeyInfo, setDataKeyInfo] = useState<TypeKeyInformation | null>();
+  const [dataDp, setDataDp] = useState<TypeDataDpData[] | null>();
+  const [loadingKey, setLoadingKey] = useState(true);
+  const [loadingPoint, setLoadingPoint] = useState(true);
 
   useEffect(() => {
-    setLoadingKey(true)
-    setLoadingPoint(true)
+    setLoadingKey(true);
+    setLoadingPoint(true);
     getCompanyKeyInformation(company_id)
       .then((response) => {
-        const res: TypeKeyInformation = response.data.data[0]
-        setDataKeyInfo(res)
+        const res: TypeKeyInformation = response.data.data[0];
+        setDataKeyInfo(res);
       })
       .finally(() => {
-        setLoadingKey(false)
-      })
+        setLoadingKey(false);
+      });
 
     getCompanyDataPoints(company_id)
       .then((response) => {
-        const res = response.data.data[0]
+        const res = response.data.data[0];
         const res1 = [
           {
-            topic: 'Environmental',
-            value_type: '-',
+            topic: "Environmental",
+            value_type: "-",
             value: res.negative?.environmental || 0,
-            id: 'Environmental-' + res.negative?.environmental,
+            id: "Environmental-" + res.negative?.environmental,
           },
           {
-            topic: 'Environmental',
-            value_type: '+',
+            topic: "Environmental",
+            value_type: "+",
             value: res.positive?.environmental || 0,
-            id: 'Environmental+' + res.positive?.environmental,
+            id: "Environmental+" + res.positive?.environmental,
           },
           {
-            topic: 'Governance',
-            value_type: '-',
+            topic: "Governance",
+            value_type: "-",
             value: res.negative?.governance || 0,
-            id: 'Governance-' + res.negative?.governance,
+            id: "Governance-" + res.negative?.governance,
           },
           {
-            topic: 'Governance',
-            value_type: '+',
+            topic: "Governance",
+            value_type: "+",
             value: res.positive?.governance || 0,
-            id: 'Governance+' + res.positive?.governance,
+            id: "Governance+" + res.positive?.governance,
           },
           {
-            topic: 'Social',
-            value_type: '-',
+            topic: "Social",
+            value_type: "-",
             value: res.negative?.social || 0,
-            id: 'Social-' + res.negative?.social,
+            id: "Social-" + res.negative?.social,
           },
           {
-            topic: 'Social',
-            value_type: '+',
+            topic: "Social",
+            value_type: "+",
             value: res.positive?.social || 0,
-            id: 'Social+' + res.positive?.social,
+            id: "Social+" + res.positive?.social,
           },
-        ]
-        setDataDp(res1)
+        ];
+        setDataDp(res1);
       })
       .finally(() => {
-        setLoadingPoint(false)
-      })
-  }, [company_id])
+        setLoadingPoint(false);
+      });
+  }, [company_id]);
 
   return loadingKey || loadingPoint ? (
     <PageLoading />
   ) : (
     <div className="my-3 dark:text-gray-300">
       <h2 className="text-xl leading-10 hover:shadow hover:border hover:border-black hover:border-solid">
-        {company_name}
+        {getCompanyName(company_id, companies)}
       </h2>
       <div>
         <div className="text-xs mt-4 mb-3">Sector</div>
@@ -115,22 +120,22 @@ export const Summary: React.FC = () => {
             target="_blank"
             className="break-all"
           >
-            {dataKeyInfo?.sustainability_report || 'null'}
+            {dataKeyInfo?.sustainability_report || "null"}
           </a>
         </div>
         <div className="text-xs mt-3 mb-5">Disclosure Score</div>
         <div className="text-xl leading-8 hover:shadow hover:border hover:border-black hover:border-solid">
-          {dataKeyInfo?.disclosure_score || '0'}
+          {dataKeyInfo?.disclosure_score || "0"}
         </div>
         <div className="text-xs mt-3 mb-5">Carbon Emissions(mt)</div>
         <div className="text-xl leading-8 hover:shadow hover:border hover:border-black hover:border-solid">
-          {dataKeyInfo?.latest_emissions || 'null'}
+          {dataKeyInfo?.latest_emissions || "null"}
         </div>
         <div className="text-xs mt-3 mb-5">Charity Supported</div>
         <div className="text-xl leading-8 hover:shadow hover:border hover:border-black hover:border-solid">
-          {dataKeyInfo?.charities_supported || '0'}
+          {dataKeyInfo?.charities_supported || "0"}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
